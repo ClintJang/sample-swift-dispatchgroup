@@ -5,9 +5,10 @@ Wait for it to finish and use it when you expect it to be called when it's all d
 
 - "notify" works asynchronously.
 - "wait" works synchronously.
+- "queue, notify" works synchronously
 
 ## Result Image (GIF)
-<img width="400" src="/Image/resultInfo.gif">
+<img width="400" src="/Image/resultInfo00.gif">
 
 ## Case 01 (notify)
 > asynchronous
@@ -81,38 +82,89 @@ func dispatchGroupTestCase2Wait() {
 
 ```
 
+## Case 03 (queue, notify)
+> asynchronous, Do not use enter and leave.
+
+```swift
+func dispatchGroupTestCase3QueueNotify() {
+    writeLog("=====================\n== asynchronous")
+    writeLog("=====================\n== Do not use enter and leave.")
+    writeLog("\(#function), start")
+    let dispatchGroup = DispatchGroup()
+    let dispatchQueueGlobal = DispatchQueue.global()
+    
+    dispatchQueueGlobal.async(group: dispatchGroup, execute: { [weak self] in
+        guard let self = self else { return }
+        let _ = self.roof20_000_000()
+    })
+    
+    dispatchQueueGlobal.async(group: dispatchGroup, execute: { [weak self] in
+        guard let self = self else { return }
+        let _ = self.roof10_000_000()
+    })
+    
+    dispatchQueueGlobal.async(group: dispatchGroup, execute: { [weak self] in
+        guard let self = self else { return }
+        let _ = self.roof15_000_000()
+    })
+    
+    dispatchGroup.notify(queue: dispatchQueueGlobal) { [weak self] in
+        guard let self = self else { return }
+        self.writeLog("dispatchGroup.notify OK")
+        self.writeLog("\(#function), end")
+    }
+}
+```
+
 ## Result Log
 
 ### case 1 (notify, asynchronous)
 
 ```
-
-2019-02-01 06:24:24 +0000::=====================
+2019-02-01 08:15:42 +0000::=====================
 == asynchronous
-2019-02-01 06:24:24 +0000::dispatchGroupTestCase1Notify(), start
-2019-02-01 06:24:24 +0000::roof20_000_000(), start
-2019-02-01 06:24:24 +0000::roof10_000_000(), start
-2019-02-01 06:24:28 +0000::roof10_000_000(), end
-2019-02-01 06:24:28 +0000::roof15_000_000(), start
-2019-02-01 06:24:31 +0000::roof20_000_000(), end
-2019-02-01 06:24:33 +0000::roof15_000_000(), end
-2019-02-01 06:24:33 +0000::dispatchGroup.notify OK
-2019-02-01 06:24:33 +0000::dispatchGroupTestCase1Notify(), end
+2019-02-01 08:15:42 +0000::dispatchGroupTestCase1Notify(), start
+2019-02-01 08:15:42 +0000::roof20_000_000(), start
+2019-02-01 08:15:42 +0000::roof15_000_000(), start
+2019-02-01 08:15:42 +0000::roof10_000_000(), start
+2019-02-01 08:15:45 +0000::roof10_000_000(), end
+2019-02-01 08:15:47 +0000::roof15_000_000(), end
+2019-02-01 08:15:48 +0000::roof20_000_000(), end
+2019-02-01 08:15:48 +0000::dispatchGroup.notify OK
+2019-02-01 08:15:48 +0000::dispatchGroupTestCase1Notify(), end
 
 ```
 
 ### case 2 (wait, synchronous)
 
 ```
-2019-02-01 06:24:37 +0000::=====================
+2019-02-01 08:15:49 +0000::=====================
 == synchronous
-2019-02-01 06:24:37 +0000::dispatchGroupTestCase2Wait(), start
-2019-02-01 06:24:37 +0000::roof20_000_000(), start
-2019-02-01 06:24:37 +0000::roof10_000_000(), start
-2019-02-01 06:24:40 +0000::roof10_000_000(), end
-2019-02-01 06:24:40 +0000::roof15_000_000(), start
-2019-02-01 06:24:43 +0000::roof20_000_000(), end
-2019-02-01 06:24:45 +0000::roof15_000_000(), end
-2019-02-01 06:24:45 +0000::dispatchGroup.wait OK(result::success)
-2019-02-01 06:24:45 +0000::dispatchGroupTestCase2Wait(), end
+2019-02-01 08:15:49 +0000::dispatchGroupTestCase2Wait(), start
+2019-02-01 08:15:49 +0000::roof20_000_000(), start
+2019-02-01 08:15:49 +0000::roof10_000_000(), start
+2019-02-01 08:15:49 +0000::roof15_000_000(), start
+2019-02-01 08:15:52 +0000::roof10_000_000(), end
+2019-02-01 08:15:54 +0000::roof15_000_000(), end
+2019-02-01 08:15:55 +0000::roof20_000_000(), end
+2019-02-01 08:15:55 +0000::dispatchGroup.wait OK(result::success)
+2019-02-01 08:15:55 +0000::dispatchGroupTestCase2Wait(), end
+```
+
+### case 3 (queue, notify, asynchronous)
+
+```
+2019-02-01 08:15:57 +0000::=====================
+== asynchronous
+2019-02-01 08:15:57 +0000::=====================
+== Do not use enter and leave.
+2019-02-01 08:15:57 +0000::dispatchGroupTestCase3QueueNotify(), start
+2019-02-01 08:15:57 +0000::roof20_000_000(), start
+2019-02-01 08:15:57 +0000::roof15_000_000(), start
+2019-02-01 08:15:57 +0000::roof10_000_000(), start
+2019-02-01 08:16:00 +0000::roof10_000_000(), end
+2019-02-01 08:16:01 +0000::roof15_000_000(), end
+2019-02-01 08:16:03 +0000::roof20_000_000(), end
+2019-02-01 08:16:03 +0000::dispatchGroup.notify OK
+2019-02-01 08:16:03 +0000::dispatchGroupTestCase3QueueNotify(), end
 ```

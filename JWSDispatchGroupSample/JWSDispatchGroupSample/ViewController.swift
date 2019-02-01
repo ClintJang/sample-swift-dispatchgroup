@@ -22,6 +22,10 @@ class ViewController: UIViewController {
     @IBAction func onCase2(_ sender: Any) {
         dispatchGroupTestCase2Wait()
     }
+    
+    @IBAction func onCase3(_ sender: Any) {
+        dispatchGroupTestCase3QueueNotify()
+    }
 }
 
 // MARK: - Log
@@ -34,6 +38,7 @@ extension ViewController {
             guard let beforeLog = self.textView.text else { return }
             let fullLog = "\(beforeLog)\n\(log)"
             self.textView.text = fullLog
+            self.textView.scrollToBottom()
         }
         
     }
@@ -103,6 +108,37 @@ extension ViewController {
         self.writeLog("dispatchGroup.wait OK(result::\(result))")
         self.writeLog("\(#function), end")
     }
+    
+    // MARK: Case 3 (queue, notify, asynchronous, Do not use enter and leave.)
+    
+    func dispatchGroupTestCase3QueueNotify() {
+        writeLog("=====================\n== asynchronous")
+        writeLog("=====================\n== Do not use enter and leave.")
+        writeLog("\(#function), start")
+        let dispatchGroup = DispatchGroup()
+        let dispatchQueueGlobal = DispatchQueue.global()
+        
+        dispatchQueueGlobal.async(group: dispatchGroup, execute: { [weak self] in
+            guard let self = self else { return }
+            let _ = self.roof20_000_000()
+        })
+        
+        dispatchQueueGlobal.async(group: dispatchGroup, execute: { [weak self] in
+            guard let self = self else { return }
+            let _ = self.roof10_000_000()
+        })
+        
+        dispatchQueueGlobal.async(group: dispatchGroup, execute: { [weak self] in
+            guard let self = self else { return }
+            let _ = self.roof15_000_000()
+        })
+        
+        dispatchGroup.notify(queue: dispatchQueueGlobal) { [weak self] in
+            guard let self = self else { return }
+            self.writeLog("dispatchGroup.notify OK")
+            self.writeLog("\(#function), end")
+        }
+    }
 }
 
 // MARK: - Utils
@@ -129,3 +165,10 @@ extension ViewController {
     }
 }
 
+extension UITextView {
+    func scrollToBottom() {
+        let textCount: Int = text.count
+        guard textCount >= 1 else { return }
+        scrollRangeToVisible(NSMakeRange(textCount - 1, 1))
+    }
+}
