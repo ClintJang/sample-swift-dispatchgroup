@@ -16,11 +16,15 @@ class ViewController: UIViewController {
     }
     
     @IBAction func onCase1(_ sender: Any) {
-        dispatchGroupTestCase01()
+        dispatchGroupTestCase1Notify()
+    }
+    
+    @IBAction func onCase2(_ sender: Any) {
+        dispatchGroupTestCase2Wait()
     }
 }
 
-/// MARK: - Log
+// MARK: - Log
 extension ViewController {
     func writeLog(_ text: String) {
         let log = "\(Date())::\(text)"
@@ -34,17 +38,27 @@ extension ViewController {
         
     }
 }
-/// MARK: -
-/// MARK: Case 1
+
+// MARK: -
 extension ViewController {
-    func dispatchGroupTestCase01() {
+    
+    // MARK: Case 1 (notify, asynchronous)
+    
+    func dispatchGroupTestCase1Notify() {
+        writeLog("=====================\n== asynchronous")
         writeLog("\(#function), start")
         let dispatchGroup = DispatchGroup()
 
         dispatchGroup.enter()
         DispatchQueue.global().async { [weak self] in
             guard let self = self else { return }
-            if self.roof30_000_000() { dispatchGroup.leave() }
+            if self.roof25_000_000() { dispatchGroup.leave() }
+        }
+        
+        dispatchGroup.enter()
+        DispatchQueue.global().async { [weak self] in
+            guard let self = self else { return }
+            if self.roof10_000_000() { dispatchGroup.leave() }
         }
         
         dispatchGroup.enter()
@@ -53,36 +67,61 @@ extension ViewController {
             if self.roof20_000_000() { dispatchGroup.leave() }
         }
         
-        dispatchGroup.enter()
-        DispatchQueue.global().async { [weak self] in
-            guard let self = self else { return }
-            if self.roof25_000_000() { dispatchGroup.leave() }
-        }
-        
         dispatchGroup.notify(queue: .main) { [weak self] in
             guard let self = self else { return }
             self.writeLog("dispatchGroup.notify OK")
             self.writeLog("\(#function), end")
         }
     }
+    
+    // MARK: Case 2 (Wait, synchronous)
+    
+    func dispatchGroupTestCase2Wait() {
+        writeLog("=====================\n== synchronous")
+        writeLog("\(#function), start")
+        let dispatchGroup = DispatchGroup()
+        
+        dispatchGroup.enter()
+        DispatchQueue.global().async { [weak self] in
+            guard let self = self else { return }
+            if self.roof25_000_000() { dispatchGroup.leave() }
+        }
+        
+        dispatchGroup.enter()
+        DispatchQueue.global().async { [weak self] in
+            guard let self = self else { return }
+            if self.roof10_000_000() { dispatchGroup.leave() }
+        }
+        
+        dispatchGroup.enter()
+        DispatchQueue.global().async { [weak self] in
+            guard let self = self else { return }
+            if self.roof20_000_000() { dispatchGroup.leave() }
+        }
+        
+        let result = dispatchGroup.wait(timeout: .distantFuture)
+        self.writeLog("dispatchGroup.wait OK(result::\(result))")
+        self.writeLog("\(#function), end")
+    }
 }
 
+// MARK: - Utils
 extension ViewController {
-    func roof20_000_000() -> Bool {
+    func roof10_000_000() -> Bool {
         writeLog("\(#function), start")
-        (0...20_000_000).forEach { _ in }
-        print("\(Date())::\(#function), end")
-        return true
-    }
-    
-    func roof25_000_000() -> Bool {
-        writeLog("\(#function), start")
-        (0...25_000_000).forEach { _ in }
+        (0...15_000_000).forEach { _ in }
         writeLog("\(#function), end")
         return true
     }
     
-    func roof30_000_000() -> Bool {
+    func roof20_000_000() -> Bool {
+        writeLog("\(#function), start")
+        (0...20_000_000).forEach { _ in }
+        writeLog("\(#function), end")
+        return true
+    }
+    
+    func roof25_000_000() -> Bool {
         writeLog("\(#function), start")
         (0...30_000_000).forEach { _ in }
         writeLog("\(#function), end")
