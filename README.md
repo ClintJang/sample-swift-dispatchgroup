@@ -1,5 +1,6 @@
 # Swift Dispatchgroup Sample
 It is a repository showing a simple example using "DispatchGroup".
+(... Test cases will be added.😀)
 
 # Sample Case 01
 
