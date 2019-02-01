@@ -8,7 +8,7 @@ Wait for it to finish and use it when you expect it to be called when it's all d
 - "queue, notify" works synchronously
 
 ## Result Image (GIF)
-<img width="400" src="/Image/resultInfo00.gif">
+<img width="500" src="/Image/resultInfo00.gif">
 
 ## Case 01 (notify)
 > asynchronous
