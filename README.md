@@ -1,11 +1,13 @@
 # Swift Dispatchgroup Sample
 It is a repository showing a simple example using "DispatchGroup". <br />
+Jobs already in group via DispatchGroup
+Wait for it to finish and use it when you expect it to be called when it's all done.
 
 - "notify" works asynchronously.
 - "wait" works synchronously.
 
 ## Result Image (GIF)
-<img width="400" src="/Image/result_info.gif">
+<img width="400" src="/Image/resultInfo.gif">
 
 ## Case 01 (notify)
 > asynchronous
