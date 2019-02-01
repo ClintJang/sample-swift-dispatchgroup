@@ -52,7 +52,7 @@ extension ViewController {
         dispatchGroup.enter()
         DispatchQueue.global().async { [weak self] in
             guard let self = self else { return }
-            if self.roof25_000_000() { dispatchGroup.leave() }
+            if self.roof20_000_000() { dispatchGroup.leave() }
         }
         
         dispatchGroup.enter()
@@ -64,7 +64,7 @@ extension ViewController {
         dispatchGroup.enter()
         DispatchQueue.global().async { [weak self] in
             guard let self = self else { return }
-            if self.roof20_000_000() { dispatchGroup.leave() }
+            if self.roof15_000_000() { dispatchGroup.leave() }
         }
         
         dispatchGroup.notify(queue: .main) { [weak self] in
@@ -74,7 +74,7 @@ extension ViewController {
         }
     }
     
-    // MARK: Case 2 (Wait, synchronous)
+    // MARK: Case 2 (wait, synchronous)
     
     func dispatchGroupTestCase2Wait() {
         writeLog("=====================\n== synchronous")
@@ -84,7 +84,7 @@ extension ViewController {
         dispatchGroup.enter()
         DispatchQueue.global().async { [weak self] in
             guard let self = self else { return }
-            if self.roof25_000_000() { dispatchGroup.leave() }
+            if self.roof20_000_000() { dispatchGroup.leave() }
         }
         
         dispatchGroup.enter()
@@ -96,7 +96,7 @@ extension ViewController {
         dispatchGroup.enter()
         DispatchQueue.global().async { [weak self] in
             guard let self = self else { return }
-            if self.roof20_000_000() { dispatchGroup.leave() }
+            if self.roof15_000_000() { dispatchGroup.leave() }
         }
         
         let result = dispatchGroup.wait(timeout: .distantFuture)
@@ -109,6 +109,13 @@ extension ViewController {
 extension ViewController {
     func roof10_000_000() -> Bool {
         writeLog("\(#function), start")
+        (0...10_000_000).forEach { _ in }
+        writeLog("\(#function), end")
+        return true
+    }
+    
+    func roof15_000_000() -> Bool {
+        writeLog("\(#function), start")
         (0...15_000_000).forEach { _ in }
         writeLog("\(#function), end")
         return true
@@ -117,13 +124,6 @@ extension ViewController {
     func roof20_000_000() -> Bool {
         writeLog("\(#function), start")
         (0...20_000_000).forEach { _ in }
-        writeLog("\(#function), end")
-        return true
-    }
-    
-    func roof25_000_000() -> Bool {
-        writeLog("\(#function), start")
-        (0...30_000_000).forEach { _ in }
         writeLog("\(#function), end")
         return true
     }

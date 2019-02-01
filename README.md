@@ -1,78 +1,116 @@
 # Swift Dispatchgroup Sample
-It is a repository showing a simple example using "DispatchGroup".
-(... Test cases will be added.😀)
+It is a repository showing a simple example using "DispatchGroup". <br />
 
-# Sample Case 01
+- "notify" works asynchronously.
+- "wait" works synchronously.
+
+## Result Image (GIF)
+<img width="400" src="/Image/result_info.gif">
+
+## Case 01 (notify)
+> asynchronous
 
 ```swift
 
-extension ViewController {
-    func dispatchGroupTest01() {
-        print("\(Date())::\(#function), start")
-        let dispatchGroup = DispatchGroup()
+func dispatchGroupTestCase1Notify() {
+    writeLog("=====================\n== asynchronous")
+    writeLog("\(#function), start")
+    let dispatchGroup = DispatchGroup()
 
-        dispatchGroup.enter()
-        DispatchQueue.global().async { [weak self] in
-            guard let self = self else { return }
-            if self.roof30_000_000() { dispatchGroup.leave() }
-        }
-        
-        dispatchGroup.enter()
-        DispatchQueue.global().async { [weak self] in
-            guard let self = self else { return }
-            if self.roof20_000_000() { dispatchGroup.leave() }
-        }
-        
-        dispatchGroup.enter()
-        DispatchQueue.global().async { [weak self] in
-            guard let self = self else { return }
-            if self.roof25_000_000() { dispatchGroup.leave() }
-        }
-        
-        dispatchGroup.notify(queue: .main) {
-            print("\(Date())::dispatchGroup.notify OK")
-        }
-        print("\(Date())::\(#function), end")
+    dispatchGroup.enter()
+    DispatchQueue.global().async { [weak self] in
+        guard let self = self else { return }
+        if self.roof20_000_000() { dispatchGroup.leave() }
+    }
+    
+    dispatchGroup.enter()
+    DispatchQueue.global().async { [weak self] in
+        guard let self = self else { return }
+        if self.roof10_000_000() { dispatchGroup.leave() }
+    }
+    
+    dispatchGroup.enter()
+    DispatchQueue.global().async { [weak self] in
+        guard let self = self else { return }
+        if self.roof15_000_000() { dispatchGroup.leave() }
+    }
+    
+    dispatchGroup.notify(queue: .main) { [weak self] in
+        guard let self = self else { return }
+        self.writeLog("dispatchGroup.notify OK")
+        self.writeLog("\(#function), end")
     }
 }
 
-extension ViewController {
-    func roof20_000_000() -> Bool {
-        print("\(Date())::\(#function), start")
-        (0...20_000_000).forEach { _ in }
-        print("\(Date())::\(#function), end")
-        return true
+```
+
+## Case 02 (wait)
+> synchronous
+
+```swift
+	
+func dispatchGroupTestCase2Wait() {
+    writeLog("=====================\n== synchronous")
+    writeLog("\(#function), start")
+    let dispatchGroup = DispatchGroup()
+    
+    dispatchGroup.enter()
+    DispatchQueue.global().async { [weak self] in
+        guard let self = self else { return }
+        if self.roof20_000_000() { dispatchGroup.leave() }
     }
     
-    func roof25_000_000() -> Bool {
-        print("\(Date())::\(#function), start")
-        (0...25_000_000).forEach { _ in }
-        print("\(Date())::\(#function), end")
-        return true
+    dispatchGroup.enter()
+    DispatchQueue.global().async { [weak self] in
+        guard let self = self else { return }
+        if self.roof10_000_000() { dispatchGroup.leave() }
     }
     
-    func roof30_000_000() -> Bool {
-        print("\(Date())::\(#function), start")
-        (0...30_000_000).forEach { _ in }
-        print("\(Date())::\(#function), end")
-        return true
+    dispatchGroup.enter()
+    DispatchQueue.global().async { [weak self] in
+        guard let self = self else { return }
+        if self.roof15_000_000() { dispatchGroup.leave() }
     }
+    
+    let result = dispatchGroup.wait(timeout: .distantFuture)
+    self.writeLog("dispatchGroup.wait OK(result::\(result))")
+    self.writeLog("\(#function), end")
 }
 
 ```
 
 ## Result Log
 
+### case 1 (notify, asynchronous)
+
 ```
 
-2019-01-31 23:54:38 +0000::dispatchGroupTest01(), start
-2019-01-31 23:54:38 +0000::dispatchGroupTest01(), end
-2019-01-31 23:54:38 +0000::roof30_000_000(), start
-2019-01-31 23:54:38 +0000::roof20_000_000(), start
-2019-01-31 23:54:38 +0000::roof25_000_000(), start
-2019-01-31 23:54:44 +0000::roof20_000_000(), end
-2019-01-31 23:54:46 +0000::roof25_000_000(), end
-2019-01-31 23:54:47 +0000::roof30_000_000(), end
-2019-01-31 23:54:47 +0000::dispatchGroup.notify OK
+2019-02-01 06:24:24 +0000::=====================
+== asynchronous
+2019-02-01 06:24:24 +0000::dispatchGroupTestCase1Notify(), start
+2019-02-01 06:24:24 +0000::roof20_000_000(), start
+2019-02-01 06:24:24 +0000::roof10_000_000(), start
+2019-02-01 06:24:28 +0000::roof10_000_000(), end
+2019-02-01 06:24:28 +0000::roof15_000_000(), start
+2019-02-01 06:24:31 +0000::roof20_000_000(), end
+2019-02-01 06:24:33 +0000::roof15_000_000(), end
+2019-02-01 06:24:33 +0000::dispatchGroup.notify OK
+2019-02-01 06:24:33 +0000::dispatchGroupTestCase1Notify(), end
 
+```
+
+### case 2 (wait, synchronous)
+
+```
+2019-02-01 06:24:37 +0000::=====================
+== synchronous
+2019-02-01 06:24:37 +0000::dispatchGroupTestCase2Wait(), start
+2019-02-01 06:24:37 +0000::roof20_000_000(), start
+2019-02-01 06:24:37 +0000::roof10_000_000(), start
+2019-02-01 06:24:40 +0000::roof10_000_000(), end
+2019-02-01 06:24:40 +0000::roof15_000_000(), start
+2019-02-01 06:24:43 +0000::roof20_000_000(), end
+2019-02-01 06:24:45 +0000::roof15_000_000(), end
+2019-02-01 06:24:45 +0000::dispatchGroup.wait OK(result::success)
+2019-02-01 06:24:45 +0000::dispatchGroupTestCase2Wait(), end
 ```
